@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include "LinkedList.h"
 
-/**
- * Value col
+/*
+ * Returns a new list
  */
 ValueColLinkedList* createValueColLinkedList()
 {
@@ -22,6 +22,9 @@ ValueColLinkedList* createValueColLinkedList()
     return list;
 }
 
+/*
+ * Frees allocated memory for a given list
+ */ 
 void freeValueColLinkedList(ValueColLinkedList* list)
 {
     if(!list)
@@ -36,6 +39,9 @@ void freeValueColLinkedList(ValueColLinkedList* list)
     free(list);
 }
 
+/*
+ * Adds a value and its column index to the list
+ */
 void pushBackValueCol(ValueColLinkedList* list, int element, int column)
 {
     if(!list)
