@@ -1,10 +1,32 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <getopt.h>
 #include "LinkedList.h"
 #include "SparseMatrix.h"
 
-int main(int argc, const char * argv[])
+int main(int argc, char * argv[])
 {
+    char *outfile = NULL;
+    char *infile = NULL;
+    
+    // Check for the output file
+    int c;
+    while ((c = getopt (argc, argv, "o:")) != -1)
+    {
+        if(c== 'o')outfile = optarg;
+        else return -1;
+    }
+    
+    // Check for the input file
+	if (optind < argc) infile =  argv[optind++];
+    else
+    {
+		printf("Input file missing !\n");
+		return -1;
+	}
+         
+    printf("in : %s\nout : %s\n", infile, outfile);
+	
     SparseMatrix* first, *second, *third, *fourth, *fifth;
     
     first = createMatrix(2, 2);
