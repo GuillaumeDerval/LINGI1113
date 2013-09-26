@@ -157,7 +157,7 @@ int getIntegerDisplaySize(int integer)
     return size;
 }
 
-void printMatrix(SparseMatrix* matrix, int mode)
+void printMatrix(FILE * out, SparseMatrix* matrix, int mode)
 {
     //Help us to reorder line components
     int* line = (int*)malloc(sizeof(int)*matrix->n);
@@ -199,30 +199,30 @@ void printMatrix(SparseMatrix* matrix, int mode)
         if(mode >= 3)
         {
             for(int j = 0; j < totalLineWidth; j++)
-                printf("-");
-            printf("\n");
+                fprintf(out, "-");
+            fprintf(out, "\n");
         }
         
         if(mode >= 2)
-            printf("|");
+            fprintf(out, "|");
         for(int j = 0; j < matrix->n; j++)
         {
             if(mode)
                 for(int spaces = lineWidth[j]-getIntegerDisplaySize(line[j]); spaces > 0; spaces--)
-                    printf(" ");
-            printf("%i", line[j]);
+                    fprintf(out, " ");
+            fprintf(out, "%i", line[j]);
             if(mode >= 2)
-                printf("|");
+                fprintf(out, "|");
             else
-                printf(" ");
+                fprintf(out, " ");
         }
-        printf("\n");
+        fprintf(out, "\n");
     }
     if(mode >= 3)
     {
         for(int j = 0; j < totalLineWidth; j++)
-            printf("-");
-        printf("\n");
+            fprintf(out, "-");
+        fprintf(out, "\n");
     }
     
     if(mode)

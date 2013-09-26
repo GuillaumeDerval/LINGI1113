@@ -28,5 +28,5 @@ SparseMatrix* multiplyMatrixes(SparseMatrix* left, SparseMatrix* right);
 // mode = 1 -> align numbers
 // mode = 2 -> align numbers and create lateral borders
 // mode = 3 -> align numbers and create all borders
-void printMatrix(SparseMatrix* matrix, int mode);
+void printMatrix(FILE* out, SparseMatrix* matrix, int mode);
 #endif
