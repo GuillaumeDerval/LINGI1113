@@ -55,6 +55,7 @@ int main(int argc, char * argv[])
                 }
                 
             }
+            if( second->lineStart[i] == NULL) second->lineStart[i] = second->valueInfo->last;
         }
         second->lineStart[m] = NULL;
         
