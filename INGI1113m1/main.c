@@ -44,7 +44,7 @@ int main(int argc, char * argv[])
             {
                 int value;
                 fscanf(inputfile, "%d", &value);
-                if(value != 0)
+                if(value != 0 || (value==0 && j==n-1)) // Adds the last zero position if lines contains only zeros
                 {
                     pushBackValueCol(second->valueInfo, value, j);
                     if(fvalue ==0) // We found the first non-zero value
@@ -55,7 +55,6 @@ int main(int argc, char * argv[])
                 }
                 
             }
-            if( second->lineStart[i] == NULL) second->lineStart[i] = second->valueInfo->last;
         }
         second->lineStart[m] = NULL;
         
