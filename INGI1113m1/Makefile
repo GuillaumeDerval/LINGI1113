@@ -1,6 +1,6 @@
 EXEC=matrixprod
-CFLAGS=-I $(HOME)/local/include -Wall -Werror -g -std=c99
-LDFLAGS=-L $(HOME)/local/lib -lm
+CFLAGS=-I $(HOME)/local/include -Wall -Werror -g -std=gnu99
+LDFLAGS=-L $(HOME)/local/lib -lm -lrt
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
 
