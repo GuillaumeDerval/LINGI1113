@@ -1,11 +1,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <time.h>
 #include "LinkedList.h"
 #include "SparseMatrix.h"
 
+struct timespec diff(struct timespec start, struct timespec end)
+{
+        struct timespec temp;
+        if ((end.tv_nsec - start.tv_nsec) < 0) 
+        {
+                temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+                temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+        } 
+        else 
+        {
+                temp.tv_sec = end.tv_sec - start.tv_sec;
+                temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+        }
+        return temp;
+}
+
 int main(int argc, char * argv[])
 {
+    struct timespec start, end;
+    clock_gettime(CLOCK_REALTIME, &start);
+
     char *outfname = NULL;
     char *infname = NULL;
     
@@ -84,6 +104,12 @@ int main(int argc, char * argv[])
     }
     
     freeMatrix(first);
+
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    struct timespec result = diff(start, end);
+    
+    printf("Elapsed time : %lfs\n", (double) (result.tv_sec *1000000000+ result.tv_nsec)/1000000000);
     
     return 0;
 }
