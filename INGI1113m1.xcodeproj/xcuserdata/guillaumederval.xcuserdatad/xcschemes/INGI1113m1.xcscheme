@@ -57,6 +57,20 @@
             ReferencedContainer = "container:INGI1113m1.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-o &quot;/Users/guillaumederval/Dropbox/UCL/Groupe/Syst&#232;me Informatique 2/output.txt&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-n"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "&quot;/Users/guillaumederval/Dropbox/UCL/Groupe/Syst&#232;me Informatique 2/data.txt&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -141,6 +141,20 @@ SparseMatrix* multiplyMatrixes(SparseMatrix* left, SparseMatrix* right)
     
     determinePositions(left, right, result);
     generateValues(left, right, result);
+    
+    int countZeros = 0;
+    int count = 0;
+    long size = 0;
+    float ratio = result->m*result->n;
+    for(ValueColLinkedListNode* node = result->valueInfo->first; node != NULL; node = node->next)
+    {
+        if(node->value == 0)
+            countZeros++;
+        count++;
+        size += sizeof(*node);
+    }
+    ratio/=count;
+    printf("Has %d zeros, count %d (ratio %f), size %lu\n", countZeros, count, ratio, size);
     return result;
 }
 

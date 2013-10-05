@@ -10,6 +10,7 @@
 		9B35B2A617EC45D100655996 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 9B35B2A517EC45D100655996 /* main.c */; };
 		9B35B2A817EC45D100655996 /* INGI1113m1.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B35B2A717EC45D100655996 /* INGI1113m1.1 */; };
 		9B35B2B017EC574700655996 /* LinkedList.c in Sources */ = {isa = PBXBuildFile; fileRef = 9B35B2AF17EC574700655996 /* LinkedList.c */; };
+		9B6715A717FEBBD000A58BE3 /* DummyMatrix.c in Sources */ = {isa = PBXBuildFile; fileRef = 9B6715A617FEBBD000A58BE3 /* DummyMatrix.c */; };
 		9B9FBCC917F1BFCC00D0AFB2 /* SparseMatrix.c in Sources */ = {isa = PBXBuildFile; fileRef = 9B9FBCC817F1BFCC00D0AFB2 /* SparseMatrix.c */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +33,8 @@
 		9B35B2A717EC45D100655996 /* INGI1113m1.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = INGI1113m1.1; sourceTree = "<group>"; };
 		9B35B2AE17EC572D00655996 /* LinkedList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LinkedList.h; sourceTree = "<group>"; };
 		9B35B2AF17EC574700655996 /* LinkedList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LinkedList.c; sourceTree = "<group>"; };
+		9B6715A617FEBBD000A58BE3 /* DummyMatrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DummyMatrix.c; sourceTree = "<group>"; };
+		9B6715A817FEBBDC00A58BE3 /* DummyMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DummyMatrix.h; sourceTree = "<group>"; };
 		9B9FBCC717F07B2A00D0AFB2 /* SparseMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SparseMatrix.h; sourceTree = "<group>"; };
 		9B9FBCC817F1BFCC00D0AFB2 /* SparseMatrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SparseMatrix.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -72,6 +75,8 @@
 				9B35B2AF17EC574700655996 /* LinkedList.c */,
 				9B9FBCC717F07B2A00D0AFB2 /* SparseMatrix.h */,
 				9B9FBCC817F1BFCC00D0AFB2 /* SparseMatrix.c */,
+				9B6715A617FEBBD000A58BE3 /* DummyMatrix.c */,
+				9B6715A817FEBBDC00A58BE3 /* DummyMatrix.h */,
 			);
 			path = INGI1113m1;
 			sourceTree = "<group>";
@@ -130,6 +135,7 @@
 				9B35B2A617EC45D100655996 /* main.c in Sources */,
 				9B35B2B017EC574700655996 /* LinkedList.c in Sources */,
 				9B9FBCC917F1BFCC00D0AFB2 /* SparseMatrix.c in Sources */,
+				9B6715A717FEBBD000A58BE3 /* DummyMatrix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +202,8 @@
 		9B35B2AC17EC45D100655996 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_CFLAGS = "-lrt";
+				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -203,6 +211,8 @@
 		9B35B2AD17EC45D100655996 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_CFLAGS = "-lrt";
+				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
