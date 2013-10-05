@@ -35,6 +35,7 @@
 		9B35B2AF17EC574700655996 /* LinkedList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LinkedList.c; sourceTree = "<group>"; };
 		9B6715A617FEBBD000A58BE3 /* DummyMatrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DummyMatrix.c; sourceTree = "<group>"; };
 		9B6715A817FEBBDC00A58BE3 /* DummyMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DummyMatrix.h; sourceTree = "<group>"; };
+		9B71B32F18008793002F599F /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		9B9FBCC717F07B2A00D0AFB2 /* SparseMatrix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SparseMatrix.h; sourceTree = "<group>"; };
 		9B9FBCC817F1BFCC00D0AFB2 /* SparseMatrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SparseMatrix.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,6 +78,7 @@
 				9B9FBCC817F1BFCC00D0AFB2 /* SparseMatrix.c */,
 				9B6715A617FEBBD000A58BE3 /* DummyMatrix.c */,
 				9B6715A817FEBBDC00A58BE3 /* DummyMatrix.h */,
+				9B71B32F18008793002F599F /* test.h */,
 			);
 			path = INGI1113m1;
 			sourceTree = "<group>";

@@ -5,6 +5,10 @@
 #include "LinkedList.h"
 #include "SparseMatrix.h"
 #include "DummyMatrix.h"
+#include "test.h"
+
+long nbOperations = 0;
+
 
 #ifdef __MACH__
 #include <sys/time.h>
@@ -20,6 +24,13 @@
         return 0;
     }
 #endif
+
+long getAndReinit()
+{
+    long t = nbOperations;
+    nbOperations = 0;
+    return t;
+}
 
 struct timespec diff(struct timespec start, struct timespec end)
 {
@@ -37,6 +48,100 @@ struct timespec diff(struct timespec start, struct timespec end)
         return temp;
 }
 
+void generateStatsTest(int m, int n, int nbMul, int percentZero)
+{
+    srand ((unsigned int)time(NULL));
+    SparseMatrix *firstSparse = NULL;
+    DummyMatrix firstDummy;
+    getAndReinit();
+    
+    long opCountS = 0;
+    long timeS = 0;
+    long opCountD = 0;
+    long timeD = 0;
+    
+    struct timespec start, end, result;
+    for(int count = 0; count <= nbMul; count++)
+    {
+        SparseMatrix *nsparse = createMatrix(m,n);
+        DummyMatrix ndummy = createDummyMatrix(m,n);
+        for(int i = 0; i < m; i++)
+        {
+            int fvalue = 0; // First non-zero value of the line
+            for(int j = 0; j < n; j++)
+            {
+                if((1+(rand()%100)) > percentZero)
+                {
+                    //Add to sparse
+                    pushBackValueCol(nsparse->valueInfo, 1, j);
+                    if(fvalue == 0) // We found the first non-zero value
+                    {
+                        fvalue = 1;
+                        for(int k = i; k >= 0 && nsparse->lineStart[k] == NULL; k--)
+                            nsparse->lineStart[k] = nsparse->valueInfo->last;
+                    }
+                    //Add to dummy
+                    ndummy.matrix[i][j] = 1;
+                }
+                else
+                    ndummy.matrix[i][j] = 0;
+            }
+        }
+            
+        if(firstSparse == NULL)
+        {
+            firstSparse = nsparse;
+            firstDummy = ndummy;
+        }
+        else
+        {
+            SparseMatrix *tempS = firstSparse;
+            DummyMatrix tempD = firstDummy;
+            
+            //Sparse
+            clock_gettime(CLOCK_REALTIME, &start);
+            firstSparse = multiplyMatrixes(firstSparse, nsparse);
+            clock_gettime(CLOCK_REALTIME, &end);
+            result = diff(start, end);
+            timeS += result.tv_sec *1000000000+ result.tv_nsec;
+            
+            opCountS += getAndReinit();
+            freeMatrix(tempS);
+            freeMatrix(nsparse);
+            
+            //Dummy
+            clock_gettime(CLOCK_REALTIME, &start);
+            firstDummy = multiplyDummyMatrixes(firstDummy, ndummy);
+            clock_gettime(CLOCK_REALTIME, &end);
+            result = diff(start, end);
+            timeD += result.tv_sec *1000000000+ result.tv_nsec;
+            
+            opCountD += getAndReinit();
+            freeDummyMatrix(tempD);
+            freeDummyMatrix(ndummy);
+        }
+    }
+    
+    freeMatrix(firstSparse);
+    freeDummyMatrix(firstDummy);
+    
+    printf("%d,%lu,%lu,%lu,%lu\n",percentZero, opCountS, timeS, opCountD, timeD);
+}
+
+void generateStats()
+{
+    int m = 200;
+    int n = 200;
+    int count = 10;
+    
+    printf("Test for matrixes of size %dx%d, %d multiplications\n",m,n,count);
+    printf("PercentOfZero,NbOperationSparse,TimeNanoSecSparse,NbOperationDummy,TimeNanoSecDummy\n");
+    for(int i = 0; i <= 100; i+= 1)
+    {
+        generateStatsTest(m,n,count,i);
+    }
+}
+
 int main(int argc, char * argv[])
 {
     struct timespec start, end;
@@ -45,13 +150,18 @@ int main(int argc, char * argv[])
     char *outfname = NULL;
     char *infname = NULL;
     int sparse = 1;
-    
+
     // Check for the output file
     int c;
-    while ((c = getopt (argc, argv, "no:")) != -1)
+    while ((c = getopt (argc, argv, "tdo:")) != -1)
     {
         if(c == 'o')outfname = optarg;
-        else if(c == 'n')sparse = 0;
+        else if(c == 'd')sparse = 0;
+        else if(c == 't') //test
+        {
+            generateStats();
+            return EXIT_SUCCESS;
+        }
         else return -1;
     }
     

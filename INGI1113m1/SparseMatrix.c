@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "SparseMatrix.h"
+#include "test.h"
 
 /*
  * Based on http://www.mgnet.org/~douglas/Preprints/pub0034.pdf SYMBMM algorithm.
@@ -44,7 +45,11 @@ void determinePositions(SparseMatrix* firstMatrix, SparseMatrix* secondMatrix, S
         }
         
         result->lineStart[i] = NULL;
-        if((rmNode == NULL && result->valueInfo->first != NULL) || rmNode->next != NULL) //if we added a new element
+        if(rmNode == NULL && result->valueInfo->first == NULL)
+        {
+            //
+        }
+        else if((rmNode == NULL && result->valueInfo->first != NULL) || rmNode->next != NULL) //if we added a new element
         {
             rmNode = rmNode == NULL ? result->valueInfo->first : rmNode->next;
             
@@ -81,6 +86,7 @@ void generateValues(SparseMatrix* firstMatrix, SparseMatrix* secondMatrix, Spars
             for(ValueColLinkedListNode* smNode = secondMatrix->lineStart[fmNode->column]; smNode != secondMatrix->lineStart[fmNode->column+1]; smNode = smNode->next)
             {
                 temp[smNode->column] = temp[smNode->column] + fmNode->value * smNode->value;
+                nbOperations++;
             }
         }
         
@@ -106,6 +112,8 @@ SparseMatrix* createMatrix(int m, int n)
         free(matrix);
         return NULL;
     }
+    for(int i = 0; i < m+1; i++)
+        matrix->lineStart[i] = NULL;
     
     matrix->valueInfo = createValueColLinkedList();
     if(!matrix->valueInfo)
@@ -142,7 +150,7 @@ SparseMatrix* multiplyMatrixes(SparseMatrix* left, SparseMatrix* right)
     determinePositions(left, right, result);
     generateValues(left, right, result);
     
-    int countZeros = 0;
+    /*int countZeros = 0;
     int count = 0;
     long size = 0;
     float ratio = result->m*result->n;
@@ -154,7 +162,7 @@ SparseMatrix* multiplyMatrixes(SparseMatrix* left, SparseMatrix* right)
         size += sizeof(*node);
     }
     ratio/=count;
-    printf("Has %d zeros, count %d (ratio %f), size %lu\n", countZeros, count, ratio, size);
+    printf("Has %d zeros, count %d (ratio %f), size %lu\n", countZeros, count, ratio, size);*/
     return result;
 }
 

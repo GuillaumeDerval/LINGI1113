@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "DummyMatrix.h"
+#include "test.h"
 
 DummyMatrix createDummyMatrix(int m, int n)
 {
@@ -42,7 +43,10 @@ DummyMatrix multiplyDummyMatrixes(DummyMatrix first, DummyMatrix second)
         {
             dummy.matrix[i][j] = 0;
             for(int k = 0; k < first.n; k++)
+            {
                 dummy.matrix[i][j] += first.matrix[i][k]*second.matrix[k][j];
+                nbOperations++;
+            }
         }
     }
     return dummy;

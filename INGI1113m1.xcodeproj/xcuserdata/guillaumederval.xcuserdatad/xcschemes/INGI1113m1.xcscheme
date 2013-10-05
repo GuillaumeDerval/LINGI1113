@@ -63,8 +63,8 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-n"
-            isEnabled = "NO">
+            argument = "-t"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "&quot;/Users/guillaumederval/Dropbox/UCL/Groupe/Syst&#232;me Informatique 2/data.txt&quot;"
