@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{palatino} 
+\usepackage{xcolor}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\title{SINF1121 - Groupe 9\\Rapport 1}
+\author{Gégo Anthony\\Derval Guillaume}
+\def\blurb{\textsc{Université catholique de Louvain\\
+  École polytechnique de Louvain}}
+\def\clap#1{\hbox to 0pt{\hss #1\hss}}%
+\def\ligne#1{%
+  \hbox to \hsize{%
+    \vbox{\centering #1}}}%
+\def\haut#1#2#3{%
+  \hbox to \hsize{%
+    \rlap{\vtop{\raggedright #1}}%
+    \hss
+    \clap{\vbox{\vfill\centering #2\vfill}}%
+    \hss
+    \llap{\vtop{\raggedleft #3}}}}%
+\begin{document}
+\begin{titlepage}
+\thispagestyle{empty}\vbox to 1\vsize{%
+  \vss
+  \vbox to 1\vsize{%
+    \haut{\includegraphics[scale=0.15]{logo_ucl.pdf}}{\blurb}{\includegraphics[scale=0.4]{logo_epl.jpg}}
+    \vfill
+    \ligne{\huge \textbf{\textsc{Systèmes informatiques II (INGI1113)}}}
+    \vspace{5mm}
+    \ligne{\Large \textbf{Projet 1 - Multiplication de matrices creuses}}
+    \vspace{5mm}
+    \ligne{\large{-- 6 octobre 2013 --}}
+    %\begin{center}\includegraphics[scale=3]{img/img_couverture.png}\end{center}
+    \vfill
+    \ligne{%
+      \begin{tabular}{c}
+        \textsc{Travail du groupe G35 :}
+      \end{tabular}}
+    \vspace{5mm}
+    \ligne{%
+      \begin{tabular}{lrclr}
+         \textsc{Derval} Guillaume  & 68911100 & \hspace{80pt} & \textsc{Gégo} Anthony  & 28581100
+      \end{tabular}
+      }
+    }%
+  \vss
+  }
+\end{titlepage}
+
+\section{Introduction}
+En guise de premier projet pour le cours de Systèmes informatiques II, nous avons été invités à réaliser un petit programme de multiplication de matrices creuses. L'enjeu était de trouver une représentation de ces matrices afin de stocker uniquement les informations utiles et ainsi de simplifier les calculs.
+La solution retenue est la représentation de Yale. Plusieurs tests de comparaison avec un produit matriciel classique ont été effectués et seront présentés par après.
+\end{document}

@@ -1,11 +1,3 @@
-//
-//  LinkedList.h
-//  INGI1113m1
-//
-//  Created by Guillaume Derval on 20/09/13.
-//  Copyright (c) 2013 Guillaume Derval. All rights reserved.
-//
-
 #ifndef INGI1113m1_LinkedList_h
 #define INGI1113m1_LinkedList_h
 

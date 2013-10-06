@@ -1,10 +1,3 @@
-//
-//  LinkedList.c
-//  INGI1113m1
-//
-//  Created by Guillaume Derval on 20/09/13.
-//  Copyright (c) 2013 Guillaume Derval. All rights reserved.
-//
 #include <stdlib.h>
 #include <stdio.h>
 #include "LinkedList.h"

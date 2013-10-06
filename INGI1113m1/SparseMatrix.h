@@ -1,11 +1,3 @@
-//
-//  SparseMatrix.h
-//  INGI1113m1
-//
-//  Created by Guillaume Derval on 23/09/13.
-//  Copyright (c) 2013 Guillaume Derval. All rights reserved.
-//
-
 #ifndef INGI1113m1_SparseMatrix_h
 #define INGI1113m1_SparseMatrix_h
 #include "LinkedList.h"
@@ -29,4 +21,5 @@ SparseMatrix* multiplyMatrixes(SparseMatrix* left, SparseMatrix* right);
 // mode = 2 -> align numbers and create lateral borders
 // mode = 3 -> align numbers and create all borders
 void printMatrix(FILE* out, SparseMatrix* matrix, int mode);
+int getIntegerDisplaySize(int integer);
 #endif

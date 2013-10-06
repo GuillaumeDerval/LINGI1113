@@ -1,11 +1,3 @@
-//
-//  DummyMatrix.h
-//  INGI1113m1
-//
-//  Created by Guillaume Derval on 4/10/13.
-//  Copyright (c) 2013 Guillaume Derval. All rights reserved.
-//
-
 #ifndef INGI1113m1_DummyMatrix_h
 #define INGI1113m1_DummyMatrix_h
 
@@ -29,4 +21,5 @@ DummyMatrix multiplyDummyMatrixes(DummyMatrix first, DummyMatrix second);
 // mode = 2 -> align numbers and create lateral borders
 // mode = 3 -> align numbers and create all borders
 void printDummyMatrix(FILE* out, DummyMatrix matrix, int mode);
+int getIntegerDisplaySize(int integer);
 #endif

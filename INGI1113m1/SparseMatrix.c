@@ -1,11 +1,3 @@
-//
-//  SparseMatrix.c
-//  INGI1113m1
-//
-//  Created by Guillaume Derval on 24/09/13.
-//  Copyright (c) 2013 Guillaume Derval. All rights reserved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "SparseMatrix.h"
