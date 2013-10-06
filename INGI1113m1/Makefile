@@ -13,4 +13,4 @@ $(EXEC): $(OBJ)
 	$(CC) -o $@ $(OBJ) $(LDFLAGS)
 
 clean:
-	rm -rf *.o matrixprod
+	rm -rf *.o $(EXEC)
