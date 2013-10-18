@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 2.9.4 #5595 (Oct 14 2013) (Mac OS X ppc)
-; This file was generated Thu Oct 17 14:05:26 2013
+; This file was generated Fri Oct 18 14:41:47 2013
 ;--------------------------------------------------------
 ; PIC16 port for the Microchip 16-bit core micros
 ;--------------------------------------------------------
@@ -15,6 +15,12 @@
 	global _DisplayWORD
 	global _DisplayString
 	global _strlcpy
+	global _timer0count
+	global _timer1count
+	global _HighISR
+	global _init_board
+	global _activateTimer0
+	global _activateTimer1
 	global _main
 
 ;--------------------------------------------------------
@@ -449,7 +455,10 @@
 ;	Equates to used internal registers
 ;--------------------------------------------------------
 STATUS	equ	0xfd8
+PCLATH	equ	0xffa
+PCLATU	equ	0xffb
 WREG	equ	0xfe8
+BSR	equ	0xfe0
 FSR0L	equ	0xfe9
 FSR0H	equ	0xfea
 FSR1L	equ	0xfe1
@@ -459,6 +468,7 @@ POSTDEC1	equ	0xfe5
 PREINC1	equ	0xfe4
 PLUSW2	equ	0xfdb
 PRODL	equ	0xff3
+PRODH	equ	0xff4
 
 
 ; Internal registers
@@ -487,6 +497,12 @@ r0x14	res	1
 r0x15	res	1
 
 udata_test_0	udata
+_timer0count	res	4
+
+udata_test_1	udata
+_timer1count	res	4
+
+udata_test_2	udata
 _DisplayWORD_WDigit_1_1	res	6
 
 ;--------------------------------------------------------
@@ -496,71 +512,78 @@ _DisplayWORD_WDigit_1_1	res	6
 ;--------------------------------------------------------
 ; global & static initialisations
 ;--------------------------------------------------------
+; ; Starting pCode block for absolute section
+; ;-----------------------------------------
+S_test_ivec_0x1_HighISR	code	0X000008
+ivec_0x1_HighISR:
+	GOTO	_HighISR
+
 ; I code from now on!
 ; ; Starting pCode block
 S_test__main	code
 _main:
-;	.line	24; test.c	LED0_TRIS = 0; //configure 1st led pin as output (yellow)
-	BCF	_TRISJbits, 0
-;	.line	25; test.c	LED1_TRIS = 0; //configure 2nd led pin as output (red)
-	BCF	_TRISJbits, 1
-;	.line	26; test.c	LED2_TRIS = 0; //configure 3rd led pin as output (red)
-	BCF	_TRISJbits, 2
-;	.line	28; test.c	BUTTON0_TRIS = 1; //configure button0 as input
-	BSF	_TRISBbits, 3
-;	.line	30; test.c	LCDInit();
+;	.line	93; test.c	init_board();
+	CALL	_init_board
+;	.line	95; test.c	LATJbits.LATJ0=0; // switch LED off
+	BCF	_LATJbits, 0
+;	.line	96; test.c	LATJbits.LATJ1=0; // switch LED off
+	BCF	_LATJbits, 1
+;	.line	97; test.c	LATJbits.LATJ2=0; // switch LED off
+	BCF	_LATJbits, 2
+	BANKSEL	_timer0count
+;	.line	99; test.c	timer0count = 0;  // tick count = 0
+	CLRF	_timer0count, B
+	BANKSEL	(_timer0count + 1)
+	CLRF	(_timer0count + 1), B
+	BANKSEL	(_timer0count + 2)
+	CLRF	(_timer0count + 2), B
+	BANKSEL	(_timer0count + 3)
+	CLRF	(_timer0count + 3), B
+	BANKSEL	_timer1count
+;	.line	100; test.c	timer1count = 0;
+	CLRF	_timer1count, B
+	BANKSEL	(_timer1count + 1)
+	CLRF	(_timer1count + 1), B
+	BANKSEL	(_timer1count + 2)
+	CLRF	(_timer1count + 2), B
+	BANKSEL	(_timer1count + 3)
+	CLRF	(_timer1count + 3), B
+;	.line	102; test.c	LCDInit();
 	CALL	_LCDInit
-;	.line	31; test.c	DelayMs(100);
-	MOVLW	0x10
+;	.line	103; test.c	activateTimer0();
+	CALL	_activateTimer0
+;	.line	104; test.c	activateTimer1();
+	CALL	_activateTimer1
+_00133_DS_:
+	BANKSEL	_timer1count
+;	.line	108; test.c	if(timer1count != 0)
+	MOVF	_timer1count, W, B
+	BANKSEL	(_timer1count + 1)
+	IORWF	(_timer1count + 1), W, B
+	BANKSEL	(_timer1count + 2)
+	IORWF	(_timer1count + 2), W, B
+	BANKSEL	(_timer1count + 3)
+	IORWF	(_timer1count + 3), W, B
+	BZ	_00130_DS_
+	BANKSEL	_timer1count
+;	.line	112; test.c	DisplayWORD(0, timer1count);
+	MOVF	_timer1count, W, B
 	MOVWF	r0x00
-	MOVLW	0x98
+	BANKSEL	(_timer1count + 1)
+	MOVF	(_timer1count + 1), W, B
 	MOVWF	r0x01
-	MOVLW	0x02
-	MOVWF	r0x02
-	CLRF	r0x03
-_00105_DS_:
-	MOVFF	r0x00, r0x04
-	MOVFF	r0x01, r0x05
-	MOVFF	r0x02, r0x06
-	MOVFF	r0x03, r0x07
-	MOVLW	0xff
-	ADDWF	r0x00, F
-	MOVLW	0xff
-	ADDWFC	r0x01, F
-	MOVLW	0xff
-	ADDWFC	r0x02, F
-	MOVLW	0xff
-	ADDWFC	r0x03, F
-	MOVF	r0x04, W
-	IORWF	r0x05, W
-	IORWF	r0x06, W
-	IORWF	r0x07, W
-	BNZ	_00105_DS_
-;	.line	34; test.c	EWRPTL = LOW(w);
-	MOVLW	0x05
-	BANKSEL	_EWRPTL
-	MOVWF	_EWRPTL, B
-	BANKSEL	_EWRPTH
-;	.line	35; test.c	EWRPTH = HIGH(w);
-	CLRF	_EWRPTH, B
-;	.line	36; test.c	EDATA='1';
-	MOVLW	0x31
-	MOVWF	_EDATA
-;	.line	37; test.c	EDATA='2';
-	MOVLW	0x32
-	MOVWF	_EDATA
-;	.line	38; test.c	EDATA='3';
-	MOVLW	0x33
-	MOVWF	_EDATA
-;	.line	39; test.c	EDATA='4';
-	MOVLW	0x34
-	MOVWF	_EDATA
-;	.line	40; test.c	EDATA='5';
-	MOVLW	0x35
-	MOVWF	_EDATA
-;	.line	41; test.c	EDATA=0;
-	CLRF	_EDATA
-;	.line	45; test.c	DisplayString (0,"Test of Ethernet buffer"); //first arg is start position
+	MOVF	r0x01, W
+	MOVWF	POSTDEC1
+	MOVF	r0x00, W
+	MOVWF	POSTDEC1
+	MOVLW	0x00
+	MOVWF	POSTDEC1
+	CALL	_DisplayWORD
+	MOVLW	0x03
+	ADDWF	FSR1L, F
+	BRA	_00133_DS_
+_00130_DS_:
+;	.line	116; test.c	DisplayString(0,"tmr1: 0");
 	MOVLW	UPPER(__str_0)
 	MOVWF	POSTDEC1
 	MOVLW	HIGH(__str_0)
@@ -572,91 +595,13 @@ _00105_DS_:
 	CALL	_DisplayString
 	MOVLW	0x04
 	ADDWF	FSR1L, F
-;	.line	48; test.c	DisplayString (16, "      Push But1");    
-	MOVLW	UPPER(__str_1)
-	MOVWF	POSTDEC1
-	MOVLW	HIGH(__str_1)
-	MOVWF	POSTDEC1
-	MOVLW	LOW(__str_1)
-	MOVWF	POSTDEC1
-	MOVLW	0x10
-	MOVWF	POSTDEC1
-	CALL	_DisplayString
-	MOVLW	0x04
-	ADDWF	FSR1L, F
-;	.line	50; test.c	ERDPTL = 5;
-	MOVLW	0x05
-	MOVWF	_ERDPTL
-;	.line	51; test.c	ERDPTH = 0;
-	CLRF	_ERDPTH
-;	.line	53; test.c	for(i = 16; i < 21; i++)
-	MOVLW	0x10
-	MOVWF	r0x00
-	CLRF	r0x01
-_00117_DS_:
-	MOVF	r0x01, W
-	ADDLW	0x80
-	ADDLW	0x80
-	BNZ	_00137_DS_
-	MOVLW	0x15
-	SUBWF	r0x00, W
-_00137_DS_:
-	BC	_00120_DS_
-;	.line	55; test.c	LCDText[i] =  EDATA;
-	MOVLW	LOW(_LCDText)
-	ADDWF	r0x00, W
-	MOVWF	r0x02
-	MOVLW	HIGH(_LCDText)
-	ADDWFC	r0x01, W
-	MOVWF	r0x03
-	MOVFF	r0x02, FSR0L
-	MOVFF	r0x03, FSR0H
-	MOVFF	_EDATA, INDF0
-;	.line	53; test.c	for(i = 16; i < 21; i++)
-	INCF	r0x00, F
-	BTFSC	STATUS, 0
-	INCF	r0x01, F
-	BRA	_00117_DS_
-_00120_DS_:
-;	.line	57; test.c	LCDUpdate();
-	CALL	_LCDUpdate
-_00115_DS_:
-;	.line	61; test.c	if(BUTTON0_IO == 0u) //If Button 0 is pressed
-	BTFSC	_PORTBbits, 3
-	BRA	_00112_DS_
-;	.line	62; test.c	LED_PUT(0x07);  //turn on the 3 red leds
-	MOVFF	_LATJ, r0x00
-	MOVLW	0xf8
-	ANDWF	r0x00, F
-	MOVLW	0x07
-	IORWF	r0x00, W
-	MOVWF	_LATJ
-	BRA	_00131_DS_
-_00112_DS_:
-;	.line	64; test.c	LED_PUT(0x00);  //turn them off
-	MOVLW	0xf8
-	ANDWF	_LATJ, F
-_00131_DS_:
-;	.line	65; test.c	for(i=0;i<1000;i++);
-	MOVLW	0xe8
-	MOVWF	r0x00
-	MOVLW	0x03
-	MOVWF	r0x01
-_00123_DS_:
-	MOVLW	0xff
-	ADDWF	r0x00, F
-	BTFSS	STATUS, 0
-	DECF	r0x01, F
-	MOVF	r0x00, W
-	IORWF	r0x01, W
-	BNZ	_00123_DS_
-	BRA	_00115_DS_
+	BRA	_00133_DS_
 	RETURN	
 
 ; ; Starting pCode block
 S_test__strlcpy	code
 _strlcpy:
-;	.line	147; test.c	strlcpy(char *dst, const char *src, size_t siz)
+;	.line	199; test.c	strlcpy(char *dst, const char *src, size_t siz)
 	MOVFF	FSR2L, POSTDEC1
 	MOVFF	FSR1L, FSR2L
 	MOVFF	r0x00, POSTDEC1
@@ -697,37 +642,37 @@ _strlcpy:
 	MOVFF	PLUSW2, r0x06
 	MOVLW	0x09
 	MOVFF	PLUSW2, r0x07
-;	.line	149; test.c	char       *d = dst;
+;	.line	201; test.c	char       *d = dst;
 	MOVFF	r0x00, r0x08
 	MOVFF	r0x01, r0x09
 	MOVFF	r0x02, r0x0a
-;	.line	150; test.c	const char *s = src;
+;	.line	202; test.c	const char *s = src;
 	MOVFF	r0x03, r0x0b
 	MOVFF	r0x04, r0x0c
 	MOVFF	r0x05, r0x0d
-;	.line	151; test.c	size_t      n = siz;
+;	.line	203; test.c	size_t      n = siz;
 	MOVFF	r0x06, r0x0e
 	MOVFF	r0x07, r0x0f
-;	.line	154; test.c	if (n != 0)
+;	.line	206; test.c	if (n != 0)
 	MOVF	r0x06, W
 	IORWF	r0x07, W
 	BTFSC	STATUS, 2
-	BRA	_00176_DS_
-;	.line	156; test.c	while (--n != 0)
+	BRA	_00174_DS_
+;	.line	208; test.c	while (--n != 0)
 	MOVFF	r0x03, r0x10
 	MOVFF	r0x04, r0x11
 	MOVFF	r0x05, r0x12
 	MOVFF	r0x06, r0x13
 	MOVFF	r0x07, r0x14
-_00172_DS_:
+_00170_DS_:
 	MOVLW	0xff
 	ADDWF	r0x13, F
 	BTFSS	STATUS, 0
 	DECF	r0x14, F
 	MOVF	r0x13, W
 	IORWF	r0x14, W
-	BZ	_00191_DS_
-;	.line	158; test.c	if ((*d++ = *s++) == '\0')
+	BZ	_00189_DS_
+;	.line	210; test.c	if ((*d++ = *s++) == '\0')
 	MOVFF	r0x10, FSR0L
 	MOVFF	r0x11, PRODL
 	MOVF	r0x12, W
@@ -749,9 +694,9 @@ _00172_DS_:
 	BTFSC	STATUS, 0
 	INCF	r0x02, F
 	MOVF	r0x15, W
-	BNZ	_00172_DS_
-_00191_DS_:
-;	.line	159; test.c	break;
+	BNZ	_00170_DS_
+_00189_DS_:
+;	.line	211; test.c	break;
 	MOVFF	r0x10, r0x0b
 	MOVFF	r0x11, r0x0c
 	MOVFF	r0x12, r0x0d
@@ -760,28 +705,28 @@ _00191_DS_:
 	MOVFF	r0x02, r0x0a
 	MOVFF	r0x13, r0x0e
 	MOVFF	r0x14, r0x0f
-_00176_DS_:
-;	.line	164; test.c	if (n == 0)
+_00174_DS_:
+;	.line	216; test.c	if (n == 0)
 	MOVF	r0x0e, W
 	IORWF	r0x0f, W
-	BNZ	_00183_DS_
-;	.line	166; test.c	if (siz != 0)
+	BNZ	_00181_DS_
+;	.line	218; test.c	if (siz != 0)
 	MOVF	r0x06, W
 	IORWF	r0x07, W
-	BZ	_00190_DS_
-;	.line	167; test.c	*d = '\0';          /* NUL-terminate dst */
+	BZ	_00188_DS_
+;	.line	219; test.c	*d = '\0';          /* NUL-terminate dst */
 	MOVLW	0x00
 	MOVWF	POSTDEC1
 	MOVFF	r0x08, FSR0L
 	MOVFF	r0x09, PRODL
 	MOVF	r0x0a, W
 	CALL	__gptrput1
-_00190_DS_:
-;	.line	168; test.c	while (*s++)
+_00188_DS_:
+;	.line	220; test.c	while (*s++)
 	MOVFF	r0x0b, r0x00
 	MOVFF	r0x0c, r0x01
 	MOVFF	r0x0d, r0x02
-_00179_DS_:
+_00177_DS_:
 	MOVFF	r0x00, FSR0L
 	MOVFF	r0x01, PRODL
 	MOVF	r0x02, W
@@ -793,12 +738,12 @@ _00179_DS_:
 	BTFSC	STATUS, 0
 	INCF	r0x02, F
 	MOVF	r0x06, W
-	BNZ	_00179_DS_
+	BNZ	_00177_DS_
 	MOVFF	r0x00, r0x0b
 	MOVFF	r0x01, r0x0c
 	MOVFF	r0x02, r0x0d
-_00183_DS_:
-;	.line	172; test.c	return (s - src - 1);       /* count does not include NUL */
+_00181_DS_:
+;	.line	224; test.c	return (s - src - 1);       /* count does not include NUL */
 	MOVF	r0x03, W
 	SUBWF	r0x0b, W
 	MOVWF	r0x03
@@ -839,7 +784,7 @@ _00183_DS_:
 ; ; Starting pCode block
 S_test__DisplayString	code
 _DisplayString:
-;	.line	101; test.c	void DisplayString(BYTE pos, char* text)
+;	.line	153; test.c	void DisplayString(BYTE pos, char* text)
 	MOVFF	FSR2L, POSTDEC1
 	MOVFF	FSR1L, FSR2L
 	MOVFF	r0x00, POSTDEC1
@@ -858,7 +803,7 @@ _DisplayString:
 	MOVFF	PLUSW2, r0x02
 	MOVLW	0x05
 	MOVFF	PLUSW2, r0x03
-;	.line	103; test.c	BYTE l= strlen(text)+1;
+;	.line	155; test.c	BYTE l= strlen(text)+1;
 	MOVF	r0x03, W
 	MOVWF	POSTDEC1
 	MOVF	r0x02, W
@@ -871,11 +816,11 @@ _DisplayString:
 	MOVLW	0x03
 	ADDWF	FSR1L, F
 	INCF	r0x04, F
-;	.line	104; test.c	BYTE max= 32-pos;
+;	.line	156; test.c	BYTE max= 32-pos;
 	MOVF	r0x00, W
 	SUBLW	0x20
 	MOVWF	r0x05
-;	.line	105; test.c	strlcpy((char*)&LCDText[pos], text,(l<max)?l:max );
+;	.line	157; test.c	strlcpy((char*)&LCDText[pos], text,(l<max)?l:max );
 	CLRF	r0x06
 	MOVLW	LOW(_LCDText)
 	ADDWF	r0x00, F
@@ -889,9 +834,9 @@ _DisplayString:
 	MOVWF	r0x07
 	MOVF	r0x05, W
 	SUBWF	r0x04, W
-	BNC	_00163_DS_
+	BNC	_00161_DS_
 	MOVFF	r0x05, r0x04
-_00163_DS_:
+_00161_DS_:
 	CLRF	r0x05
 	MOVF	r0x05, W
 	MOVWF	POSTDEC1
@@ -912,7 +857,7 @@ _00163_DS_:
 	CALL	_strlcpy
 	MOVLW	0x08
 	ADDWF	FSR1L, F
-;	.line	106; test.c	LCDUpdate();
+;	.line	158; test.c	LCDUpdate();
 	CALL	_LCDUpdate
 	MOVFF	PREINC1, r0x07
 	MOVFF	PREINC1, r0x06
@@ -928,7 +873,7 @@ _00163_DS_:
 ; ; Starting pCode block
 S_test__DisplayWORD	code
 _DisplayWORD:
-;	.line	79; test.c	void DisplayWORD(BYTE pos, WORD w) //WORD is a 16 bits unsigned
+;	.line	131; test.c	void DisplayWORD(BYTE pos, WORD w) //WORD is a 16 bits unsigned
 	MOVFF	FSR2L, POSTDEC1
 	MOVFF	FSR1L, FSR2L
 	MOVFF	r0x00, POSTDEC1
@@ -943,7 +888,7 @@ _DisplayWORD:
 	MOVFF	PLUSW2, r0x01
 	MOVLW	0x04
 	MOVFF	PLUSW2, r0x02
-;	.line	87; test.c	ultoa(w, WDigit, radix);      
+;	.line	139; test.c	ultoa(w, WDigit, radix);      
 	CLRF	r0x03
 	CLRF	r0x04
 	MOVLW	0x0a
@@ -963,9 +908,9 @@ _DisplayWORD:
 	CALL	_ultoa
 	MOVLW	0x07
 	ADDWF	FSR1L, F
-;	.line	88; test.c	for(j = 0; j < strlen((char*)WDigit); j++)
+;	.line	140; test.c	for(j = 0; j < strlen((char*)WDigit); j++)
 	CLRF	r0x01
-_00144_DS_:
+_00142_DS_:
 	MOVLW	HIGH(_DisplayWORD_WDigit_1_1)
 	MOVWF	r0x03
 	MOVLW	LOW(_DisplayWORD_WDigit_1_1)
@@ -991,12 +936,12 @@ _00144_DS_:
 	MOVF	r0x03, W
 	ADDLW	0x80
 	SUBWF	PRODL, W
-	BNZ	_00154_DS_
+	BNZ	_00152_DS_
 	MOVF	r0x02, W
 	SUBWF	r0x04, W
-_00154_DS_:
-	BC	_00147_DS_
-;	.line	90; test.c	LCDText[LCDPos++] = WDigit[j];
+_00152_DS_:
+	BC	_00145_DS_
+;	.line	142; test.c	LCDText[LCDPos++] = WDigit[j];
 	MOVFF	r0x00, r0x02
 	INCF	r0x00, F
 	CLRF	r0x03
@@ -1016,21 +961,21 @@ _00154_DS_:
 	MOVFF	r0x02, FSR0L
 	MOVFF	r0x03, FSR0H
 	MOVFF	r0x04, INDF0
-;	.line	88; test.c	for(j = 0; j < strlen((char*)WDigit); j++)
+;	.line	140; test.c	for(j = 0; j < strlen((char*)WDigit); j++)
 	INCF	r0x01, F
-	BRA	_00144_DS_
-_00147_DS_:
-;	.line	92; test.c	if(LCDPos < 32u)
+	BRA	_00142_DS_
+_00145_DS_:
+;	.line	144; test.c	if(LCDPos < 32u)
 	MOVFF	r0x00, r0x01
 	CLRF	r0x02
 	MOVLW	0x00
 	SUBWF	r0x02, W
-	BNZ	_00155_DS_
+	BNZ	_00153_DS_
 	MOVLW	0x20
 	SUBWF	r0x01, W
-_00155_DS_:
-	BC	_00143_DS_
-;	.line	93; test.c	LCDText[LCDPos] = 0;
+_00153_DS_:
+	BC	_00141_DS_
+;	.line	145; test.c	LCDText[LCDPos] = 0;
 	CLRF	r0x01
 	MOVLW	LOW(_LCDText)
 	ADDWF	r0x00, F
@@ -1040,8 +985,8 @@ _00155_DS_:
 	MOVFF	r0x01, FSR0H
 	MOVLW	0x00
 	MOVWF	INDF0
-_00143_DS_:
-;	.line	94; test.c	LCDUpdate();
+_00141_DS_:
+;	.line	146; test.c	LCDUpdate();
 	CALL	_LCDUpdate
 	MOVFF	PREINC1, r0x05
 	MOVFF	PREINC1, r0x04
@@ -1053,19 +998,166 @@ _00143_DS_:
 	RETURN	
 
 ; ; Starting pCode block
-__str_0:
-	DB	0x54, 0x65, 0x73, 0x74, 0x20, 0x6f, 0x66, 0x20, 0x45, 0x74, 0x68, 0x65
-	DB	0x72, 0x6e, 0x65, 0x74, 0x20, 0x62, 0x75, 0x66, 0x66, 0x65, 0x72, 0x00
+S_test__activateTimer1	code
+_activateTimer1:
+;	.line	73; test.c	void activateTimer1()
+	MOVFF	FSR2L, POSTDEC1
+	MOVFF	FSR1L, FSR2L
+;	.line	75; test.c	T1CONbits.RD16=0; //write 8 bits
+	BCF	_T1CONbits, 7
+;	.line	76; test.c	T1CONbits.T1RUN=0; //use cristal
+	BCF	_T1CONbits, 6
+;	.line	77; test.c	T1CONbits.T1CKPS0=1; //1 prescale
+	BSF	_T1CONbits, 4
+;	.line	78; test.c	T1CONbits.T1CKPS1=1; //1 prescale
+	BSF	_T1CONbits, 5
+;	.line	79; test.c	T1CONbits.T1OSCEN=1; //activate
+	BSF	_T1CONbits, 3
+;	.line	80; test.c	T1CONbits.T1SYNC=1;
+	BSF	_T1CONbits, 2
+;	.line	81; test.c	T1CONbits.TMR1CS=1;
+	BSF	_T1CONbits, 1
+;	.line	82; test.c	T1CONbits.TMR1ON=1; //activate
+	BSF	_T1CONbits, 0
+;	.line	83; test.c	PIR1bits.TMR1IF=0;
+	BCF	_PIR1bits, 0
+;	.line	84; test.c	TMR1H=0x00;
+	CLRF	_TMR1H
+;	.line	85; test.c	TMR1L=0x00;
+	CLRF	_TMR1L
+	MOVFF	PREINC1, FSR2L
+	RETURN	
+
 ; ; Starting pCode block
-__str_1:
-	DB	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x50, 0x75, 0x73, 0x68, 0x20, 0x42
-	DB	0x75, 0x74, 0x31, 0x00
+S_test__activateTimer0	code
+_activateTimer0:
+;	.line	59; test.c	void activateTimer0()
+	MOVFF	FSR2L, POSTDEC1
+	MOVFF	FSR1L, FSR2L
+;	.line	61; test.c	T0CONbits.T08BIT=0; // use timer0 16-bit counter
+	BCF	_T0CONbits, 6
+;	.line	62; test.c	T0CONbits.T0CS=0; // use timer0 instruction cycle clock
+	BCF	_T0CONbits, 5
+;	.line	63; test.c	T0CONbits.PSA=1; // disable timer0 prescaler
+	BSF	_T0CONbits, 3
+;	.line	64; test.c	T0CONbits.T0PS0=0;
+	BCF	_T0CONbits, 0
+;	.line	65; test.c	T0CONbits.T0PS1=0;
+	BCF	_T0CONbits, 1
+;	.line	66; test.c	T0CONbits.T0PS2=0; //set prescaler at 1/64.
+	BCF	_T0CONbits, 2
+;	.line	67; test.c	TMR0H=0x00;
+	CLRF	_TMR0H
+;	.line	68; test.c	TMR0L=0x00;
+	CLRF	_TMR0L
+;	.line	69; test.c	INTCONbits.T0IF=0; // clear timer0 overflow bit
+	BCF	_INTCONbits, 2
+	MOVFF	PREINC1, FSR2L
+	RETURN	
+
+; ; Starting pCode block
+S_test__init_board	code
+_init_board:
+;	.line	43; test.c	void init_board(void)
+	MOVFF	FSR2L, POSTDEC1
+	MOVFF	FSR1L, FSR2L
+;	.line	45; test.c	TRISJbits.TRISJ0    = 0;   // configure PORTJ0 for output (LED)
+	BCF	_TRISJbits, 0
+;	.line	46; test.c	TRISJbits.TRISJ1    = 0;   // configure PORTJ1 for output (LED)
+	BCF	_TRISJbits, 1
+;	.line	47; test.c	TRISJbits.TRISJ2    = 0;   // configure PORTJ1 for output (LED)
+	BCF	_TRISJbits, 2
+;	.line	49; test.c	RCONbits.IPEN       = 1;
+	BSF	_RCONbits, 7
+;	.line	50; test.c	INTCONbits.TMR0IE   = 1;   //activate interruptions
+	BSF	_INTCONbits, 5
+;	.line	51; test.c	INTCONbits.GIE      = 1;   //activate High Priority
+	BSF	_INTCONbits, 7
+;	.line	52; test.c	INTCONbits.PEIE     = 1;   //activate Low Priority
+	BSF	_INTCONbits, 6
+;	.line	54; test.c	INTCON2bits.TMR0IP  = 1;   //Timer 0 high priority
+	BSF	_INTCON2bits, 2
+;	.line	55; test.c	IPR1bits.TMR1IP     = 1;   //Timer 1 high priority
+	BSF	_IPR1bits, 0
+	MOVFF	PREINC1, FSR2L
+	RETURN	
+
+; ; Starting pCode block
+S_test__HighISR	code
+_HighISR:
+;	.line	24; test.c	void HighISR(void) interrupt 1
+	MOVFF	WREG, POSTDEC1
+	MOVFF	STATUS, POSTDEC1
+	MOVFF	BSR, POSTDEC1
+	MOVFF	PRODL, POSTDEC1
+	MOVFF	PRODH, POSTDEC1
+	MOVFF	FSR0L, POSTDEC1
+	MOVFF	FSR0H, POSTDEC1
+	MOVFF	PCLATH, POSTDEC1
+	MOVFF	PCLATU, POSTDEC1
+	MOVFF	FSR2L, POSTDEC1
+	MOVFF	FSR1L, FSR2L
+;	.line	26; test.c	if(INTCONbits.T0IF)
+	BTFSS	_INTCONbits, 2
+	BRA	_00106_DS_
+;	.line	28; test.c	INTCONbits.T0IF=0; // clear timer0 overflow bit
+	BCF	_INTCONbits, 2
+	BANKSEL	_timer0count
+;	.line	29; test.c	timer0count++;
+	INCF	_timer0count, F, B
+	BNC	_10168_DS_
+	BANKSEL	(_timer0count + 1)
+	INCF	(_timer0count + 1), F, B
+_10168_DS_:
+	BNC	_20169_DS_
+	BANKSEL	(_timer0count + 2)
+	INCF	(_timer0count + 2), F, B
+_20169_DS_:
+	BNC	_30170_DS_
+	BANKSEL	(_timer0count + 3)
+	INCF	(_timer0count + 3), F, B
+_30170_DS_:
+_00106_DS_:
+;	.line	32; test.c	if(PIR1bits.TMR1IF)
+	BTFSS	_PIR1bits, 0
+	BRA	_00109_DS_
+;	.line	34; test.c	TMR1H=0xFF;
+	MOVLW	0xff
+	MOVWF	_TMR1H
+;	.line	35; test.c	TMR1L=0xFF;
+	MOVLW	0xff
+	MOVWF	_TMR1L
+;	.line	36; test.c	PIR1bits.TMR1IF=0; // clear timer1 overflow bit
+	BCF	_PIR1bits, 0
+;	.line	37; test.c	T1CONbits.TMR1ON=0;
+	BCF	_T1CONbits, 0
+;	.line	38; test.c	timer1count=timer0count;
+	MOVFF	_timer0count, _timer1count
+	MOVFF	(_timer0count + 1), (_timer1count + 1)
+	MOVFF	(_timer0count + 2), (_timer1count + 2)
+	MOVFF	(_timer0count + 3), (_timer1count + 3)
+_00109_DS_:
+	MOVFF	PREINC1, FSR2L
+	MOVFF	PREINC1, PCLATU
+	MOVFF	PREINC1, PCLATH
+	MOVFF	PREINC1, FSR0H
+	MOVFF	PREINC1, FSR0L
+	MOVFF	PREINC1, PRODH
+	MOVFF	PREINC1, PRODL
+	MOVFF	PREINC1, BSR
+	MOVFF	PREINC1, STATUS
+	MOVFF	PREINC1, WREG
+	RETFIE	
+
+; ; Starting pCode block
+__str_0:
+	DB	0x74, 0x6d, 0x72, 0x31, 0x3a, 0x20, 0x30, 0x00
 
 
 ; Statistics:
-; code size:	 1280 (0x0500) bytes ( 0.98%)
-;           	  640 (0x0280) words
-; udata size:	    6 (0x0006) bytes ( 0.16%)
+; code size:	 1396 (0x0574) bytes ( 1.07%)
+;           	  698 (0x02ba) words
+; udata size:	   14 (0x000e) bytes ( 0.36%)
 ; access size:	   22 (0x0016) bytes
 
 

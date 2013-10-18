@@ -9,9 +9,8 @@
 #include "Include/LCDBlocking.h"
 #include "Include/TCPIP_Stack/Delay.h"
 
-//#define CLOCK_FREQ 40000000 // 40 Mhz
-//#define EXEC_FREQ CLOCK_FREQ/4 // 4 clock cycles to execute an instruction
-#define TIMER0_OVERFLOW_PER_SECOND 95.32
+//With Timer1, we computed that 1531 times a 16-bit overflow from timer0 equals to 16 seconds (Timer1). This equals to 95.75 overflow per second.
+#define TIMER0_OVERFLOW_PER_SECOND 95.75
 
 long globalcount; //tick count
 long clockoffset; //for clock

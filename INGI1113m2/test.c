@@ -16,54 +16,106 @@ void DisplayString(BYTE pos, char* text);
 void DisplayWORD(BYTE pos, WORD w);
 void DisplayIPValue(DWORD IPdw);
 size_t strlcpy(char *dst, const char *src, size_t siz);
- 
-void main(void)
-   {
-   int i;
-   WORD w;   
-   LED0_TRIS = 0; //configure 1st led pin as output (yellow)
-   LED1_TRIS = 0; //configure 2nd led pin as output (red)
-   LED2_TRIS = 0; //configure 3rd led pin as output (red)
 
-   BUTTON0_TRIS = 1; //configure button0 as input
- 
-   LCDInit();
-   DelayMs(100);
+long timer0count;
+long timer1count;
 
-   w=5;
-   EWRPTL = LOW(w);
-   EWRPTH = HIGH(w);
-   EDATA='1';
-   EDATA='2';
-   EDATA='3';
-   EDATA='4';
-   EDATA='5';
-   EDATA=0;
-
-
-
-    DisplayString (0,"Test of Ethernet buffer"); //first arg is start position
-                                                 // on 32 positions LCD
-
-    DisplayString (16, "      Push But1");    
- 
-   ERDPTL = 5;
-   ERDPTH = 0;
-
-   for(i = 16; i < 21; i++)
+//Timer Interrupt
+void HighISR(void) interrupt 1
+{
+    if(INTCONbits.T0IF)
     {
-       LCDText[i] =  EDATA;
+        INTCONbits.T0IF=0; // clear timer0 overflow bit
+        timer0count++;
     }
-    LCDUpdate();
+    
+    if(PIR1bits.TMR1IF)
+    {
+        TMR1H=0xFF;
+        TMR1L=0xFF;
+        PIR1bits.TMR1IF=0; // clear timer1 overflow bit
+        T1CONbits.TMR1ON=0;
+        timer1count=timer0count;
+    }
+}
 
-   while(1)
-   {
-      if(BUTTON0_IO == 0u) //If Button 0 is pressed
-         LED_PUT(0x07);  //turn on the 3 red leds
+// initialize board
+void init_board(void)
+{
+	TRISJbits.TRISJ0    = 0;   // configure PORTJ0 for output (LED)
+	TRISJbits.TRISJ1    = 0;   // configure PORTJ1 for output (LED)
+    TRISJbits.TRISJ2    = 0;   // configure PORTJ1 for output (LED)
+    
+    RCONbits.IPEN       = 1;
+    INTCONbits.TMR0IE   = 1;   //activate interruptions
+    INTCONbits.GIE      = 1;   //activate High Priority
+    INTCONbits.PEIE     = 1;   //activate Low Priority
+    
+    INTCON2bits.TMR0IP  = 1;   //Timer 0 high priority
+    IPR1bits.TMR1IP     = 1;   //Timer 1 high priority
+}
+
+//Timer 0
+void activateTimer0()
+{
+	T0CONbits.T08BIT=0; // use timer0 16-bit counter
+	T0CONbits.T0CS=0; // use timer0 instruction cycle clock
+	T0CONbits.PSA=1; // disable timer0 prescaler
+    T0CONbits.T0PS0=0;
+    T0CONbits.T0PS1=0;
+    T0CONbits.T0PS2=0; //set prescaler at 1/64.
+    TMR0H=0x00;
+    TMR0L=0x00;
+    INTCONbits.T0IF=0; // clear timer0 overflow bit
+}
+
+//Timer 1
+void activateTimer1()
+{
+	T1CONbits.RD16=0; //write 8 bits
+    T1CONbits.T1RUN=0; //use cristal
+    T1CONbits.T1CKPS0=1; //1 prescale
+    T1CONbits.T1CKPS1=1; //1 prescale
+    T1CONbits.T1OSCEN=1; //activate
+    T1CONbits.T1SYNC=1;
+    T1CONbits.TMR1CS=1;
+    T1CONbits.TMR1ON=1; //activate
+    PIR1bits.TMR1IF=0;
+    TMR1H=0x00;
+    TMR1L=0x00;
+}
+
+void main(void)
+{
+    float ratio;
+    int ratioi;
+    
+    init_board();
+    
+	LATJbits.LATJ0=0; // switch LED off
+	LATJbits.LATJ1=0; // switch LED off
+    LATJbits.LATJ2=0; // switch LED off
+    
+    timer0count = 0;  // tick count = 0
+    timer1count = 0;
+    
+    LCDInit();
+    activateTimer0();
+    activateTimer1();
+    
+    while(1)
+    {
+        if(timer1count != 0)
+        {
+            //ratio = timer0count/timer1count;
+            //ratioi = (int)(ratio*1000);
+            DisplayWORD(0, timer1count);
+        }
         else
-       	 LED_PUT(0x00);  //turn them off
-         for(i=0;i<1000;i++);
-   }
+        {
+            DisplayString(0,"tmr1: 0");
+        }
+    }
 }
  
 /*************************************************
