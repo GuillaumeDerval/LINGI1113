@@ -57,7 +57,7 @@
 En guise de premier projet pour le cours de Systèmes informatiques II, nous avons été invités à réaliser un petit programme de multiplication de matrices creuses. L'enjeu était de trouver une représentation de ces matrices afin de stocker uniquement les informations utiles et ainsi de simplifier les calculs.
 La solution retenue est la représentation de Yale. Plusieurs tests de comparaison avec un produit matriciel classique ont été effectués et seront présentés par après.
 \section{Représentation des matrices creuses}
-Afin de représenter les matrices creuses de manière légère, nous avons opté pour la représentation de Yale\footnote{Voir : http://en.wikipedia.org/wiki/Sparse\_matrix\#Yale\_format}. Celle-ci consiste à mémoriser la valeurs des éléments non-nuls de la matrice avec leurs positions. 
+Afin de représenter les matrices creuses de manière légère, nous avons opté pour la représentation de Yale\footnote{Voir : http://en.wikipedia.org/wiki/Sparse\_matrix\#Yale\_format}. Celle-ci consiste à mémoriser la valeur des éléments non nuls de la matrice avec leurs positions. 
 
 Nous utilisons principalement une structure en liste chainée où un nœud contient la valeur de l'élément et l'indice de la colonne où il se trouve. Nous disposons également d'un tableau de pointeurs vers des nœuds, d'une taille identique au nombre de lignes de la matrice, où l'élément d'indice $i$ pointe vers le premier nœud/élément de la ligne $i$ de la matrice.
 
@@ -66,7 +66,7 @@ Une illustration de cette représentation est disponible à la figure \ref{matri
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.9]{matrix.pdf}
-\caption{Représentation retenues pour les matrices}
+\caption{Représentation retenue pour les matrices}
 \label{matrix}
 \end{figure}
 
@@ -82,7 +82,7 @@ En raison de la structure choisie, le produit est dès lors réalisé ligne par 
 \section{Comparaison avec la méthode naïve}
 Afin de démontrer l'efficacité de la méthode mise en place par rapport à la méthode naïve de multiplication matricielle (où les valeurs nulles sont multipliées entre elles), nous avons réalisé des mesures du temps d'exécution et du nombre d'opérations (typiquement le nombre de produits entre deux \textbf{scalaires}) réalisées par notre programme.
 
-Les mesures ont été effectués sur des matrices générées aléatoirement, de taille 200x200 (multipliées une à une), avec un pourcentage de valeurs nulles croissantes, sur une machine aux spécifications suivantes :
+Les mesures ont été effectuées sur des matrices générées aléatoirement, de taille 200x200 (multipliées une à une), avec un pourcentage de valeurs nulles croissantes, sur une machine aux spécifications suivantes :
 
 \begin{itemize}
 \item Intel Core 2 Quad Q9300
@@ -100,11 +100,11 @@ Un graphique des mesures effectuées est disponible à la figure \ref{graphe}.
 \label{graphe}
 \end{figure}
 
-Il est évident que la méthode naïve aura toujours un temps d'exécution et un nombre d'opérations plus ou moins constant, puisqu'aucun produit inutile n'est évité, et que la taille des matrices, est, dans ce cas, toujours la même.
+Il est évident que la méthode naïve aura toujours un temps d'exécution et un nombre d'opérations plus ou moins constant, puisqu'aucun produit inutile n'est évité, et que la taille des matrices est, dans ce cas, toujours la même.
 
 On constate que la méthode optimisée est plus lente pour des matrices en dessous de 40\% de valeurs nulles. Ce phénomène peut notamment s'expliquer par le fait que la représentation de Yale s'avère plus lourde que la représentation classique si l'on considère des matrices pleines (étant donné que les positions des valeurs sont retenues dans le premier cas). La méthode n'est effectivement conçue que pour des matrices ayant une grande quantité de valeurs nulles.
 
-Un dernier constat est que le temps d'exécution et le nombre d'opérations diminuent linéairement par rapport au pourcentage de valeurs nulles contenues dans la matrice.
+Un dernier constat est que le temps d'exécution et le nombre d'opérations diminue linéairement par rapport au pourcentage de valeurs nulles contenues dans la matrice.
 
 \section{Conclusion}
 Ce projet nous a permis de mettre en pratique une méthode de résolution de problème très pratique en ingénierie. Il nous a également permis de rafraîchir nos connaissances en C et particulièrement dans la manipulation des pointeurs et des fichiers.
