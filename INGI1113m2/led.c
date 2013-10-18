@@ -38,15 +38,27 @@ void HighISR(void) interrupt 1
 
 void updateMode(int button)
 {
-    int i;
     long s;
+    long seconds;
     
     if(mode == 0) //display
     {
         mode = button;
         position = 0;
-        for(i = 0; i < 3; i++)
-            editValues[i]=0;
+        if(button == 1)
+        {
+			seconds = clockoffset + globalcount/TIMER0_OVERFLOW_PER_SECOND;
+			editValues[2] = seconds%60;
+			editValues[1] = (seconds/60)%60;
+			editValues[0] = (seconds/60/60)%24;
+		}
+		else
+		{
+			seconds = alarmtime;
+			editValues[2] = seconds%60;
+			editValues[1] = (seconds/60)%60;
+			editValues[0] = (seconds/60/60)%24;
+		}
     }
     else if(mode == 3) //alarm is on
     {
@@ -160,7 +172,7 @@ void DisplayEditTime(BYTE pos, long seconds)
     int th,tm,ts;
     ts = editValues[2]%60;
     tm = editValues[1]%60;
-    th = editValues[0]%60;
+    th = editValues[0]%24;
     DisplayTimeNumber(pos+0,th);
     LCDText[pos+2]=':';
     DisplayTimeNumber(pos+3,tm);
