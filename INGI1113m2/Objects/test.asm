@@ -1,7 +1,12 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
+<<<<<<< HEAD
 ; Version 2.9.4 #5595 (Oct 14 2013) (Mac OS X ppc)
 ; This file was generated Fri Oct 18 14:41:47 2013
+=======
+; Version 2.9.4 #5595 (Oct 18 2013) (UNIX)
+; This file was generated Fri Oct 18 13:30:44 2013
+>>>>>>> 57c045ac00d727bcf4720147649516d937320416
 ;--------------------------------------------------------
 ; PIC16 port for the Microchip 16-bit core micros
 ;--------------------------------------------------------
