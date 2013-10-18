@@ -1,0 +1,12 @@
+*.aux
+*.log
+*.synctex.gz
+*.tex.bak
+*-eps-converted-to.pdf
+*.a
+*.o
+*.cod
+*.hex
+*.lst
+*.asm
+*.h~
