@@ -51,11 +51,13 @@ void setMode(int new_mode)
     {
         if(new_mode == 0)
         {
+			// Mode 0 : deactive led for alarm
             mode = 0;
             LATJbits.LATJ0=0;
         }
         else if(new_mode == 1)
         {
+			// Mode 1 : set edit fields to alarm time
             mode = 1;
             position = 0;
             seconds = alarmtime == -1 ? 0 : alarmtime;
@@ -65,6 +67,7 @@ void setMode(int new_mode)
         }
         else if(new_mode == 2)
         {
+			// Mode 2 : set edit fields to actual time
             mode = 2;
             position = 0;
             seconds = globalcount/TIMER0_OVERFLOW_PER_SECOND;
@@ -74,6 +77,7 @@ void setMode(int new_mode)
         }
         else
         {
+			// Mode 3 : alarm
             mode = 3;
         }
     }
@@ -82,7 +86,7 @@ void setMode(int new_mode)
 /*
  * Manage events (when buttons are pressed)
  */
-void updateMode(int button)
+ void updateMode(int button)
 {
     long seconds;
     
@@ -130,12 +134,14 @@ void LowISR(void) interrupt 2
 {
     if(INTCON3bits.INT1IF)
     {
+		// Button 2 pressed
         INTCON3bits.INT1IF = 0;
         updateMode(2);
     }
     
     if(INTCON3bits.INT3IF)
     {
+		// Button 1 pressed
         INTCON3bits.INT3IF = 0;
         updateMode(1);
     }
@@ -202,6 +208,8 @@ void DisplayTime(BYTE pos)
 {
     int th,tm,ts;
     long seconds = globalcount/TIMER0_OVERFLOW_PER_SECOND;
+    
+    // Determine which time to display (actual or edit)
     if(mode==0 || mode == 3)
     {
         ts = seconds%60;
@@ -213,13 +221,16 @@ void DisplayTime(BYTE pos)
         ts = editValues[2];
         tm = editValues[1];
         th = editValues[0];
-        
     }
+    
+    // Print time
     DisplayTimeNumber(pos+0,th);
     LCDText[pos+2]=':';
     DisplayTimeNumber(pos+3,tm);
     LCDText[pos+5]=':';
     DisplayTimeNumber(pos+6,ts);
+    
+    // Make the edited field to blink every second
     if((mode == 1 || mode==2) && seconds % 2 == 0)
     {
         LCDText[pos+position*3]=' ';
@@ -240,9 +251,9 @@ void main()
     
     init_board();
     
-    globalcount = 8271000; // tick count = 0
+    globalcount = 0; // tick count = 0
     alarmtime = -1; // alarm is not set
-    setMode(2); // default mode = display
+    setMode(0); // default mode = display
     
     LCDInit();
     activateTimer();
@@ -275,20 +286,19 @@ void main()
             else if(actual_time==alarmtime) // triggers alarm
                 setMode(3);
                 
-            // Displaying mode
+            // Displaying some help
             switch(mode)
             {
                 case 0:
-                    DisplayString(16, "               ");
+                    DisplayString(16, "1:Alarm  2:Time");
                     break;
                 case 1:
-                    DisplayString(16, "Definir Alarme");
-                    break;
                 case 2:
-                    DisplayString(16, "Definir Heure");
+                    if(position == 2) DisplayString(16, "1:Incr. 2:OK");
+                    else DisplayString(16, "1:Incr. 2:Next");
                     break;
                 case 3:
-                    DisplayString(16, "ALARME! ALARME!");
+                    DisplayString(16, "1-2:Stop Alarm");
                     break;
             }
         }
