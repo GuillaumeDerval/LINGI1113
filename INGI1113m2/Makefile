@@ -22,40 +22,32 @@ TCPIP_HEADERS=   Include/TCPIP_Stack/ETH97J60.h \
 
 APP_HEADERS=Include/GenericTypeDefs.h \
    Include/Compiler.h \
-   Include/HardwareProfile.h 
+   Include/HardwareProfile.h \
+   clock.h
 
-test : Objects/test.o $(OBJECTS)
-	$(LD) $(LDFLAGS) Objects/test.o $(OBJECTS)
+test : Objects/test.o Objects/util.o $(OBJECTS)
+	$(LD) $(LDFLAGS) Objects/test.o Objects/util.o $(OBJECTS)
 
-testint : Objects/testint.o $(OBJECTS)
-	$(LD) $(LDFLAGS) Objects/testint.o $(OBJECTS)
-
-led : Objects/led.o $(OBJECTS)
-	$(LD) $(LDFLAGS) Objects/led.o $(OBJECTS)
-
-Objects/testint.o : testint.c $(SDCC_HEADERS) $(SDCC_PIC16_HEADERS) \
-   $(APP_HEADERS) $(TCPIP_HEADERS)
-	$(CC) $(CFLAGS) testint.c
+clock : Objects/clock.o Objects/util.o $(OBJECTS)
+	$(LD) $(LDFLAGS) Objects/clock.o Objects/util.o $(OBJECTS)
 
 Objects/test.o : test.c $(SDCC_HEADERS) $(SDCC_PIC16_HEADERS) \
    $(APP_HEADERS) $(TCPIP_HEADERS)
 	$(CC) $(CFLAGS) test.c
 
-Objects/led.o : led.c $(SDCC_HEADERS) $(SDCC_PIC16_HEADERS) \
+Objects/util.o : util.c $(SDCC_HEADERS) $(SDCC_PIC16_HEADERS) \
    $(APP_HEADERS) $(TCPIP_HEADERS)
-	$(CC) $(CFLAGS) led.c
+	$(CC) $(CFLAGS) util.c
 
+Objects/clock.o : clock.c $(SDCC_HEADERS) $(SDCC_PIC16_HEADERS) \
+   $(APP_HEADERS) $(TCPIP_HEADERS)
+	$(CC) $(CFLAGS) clock.c
 
 Objects/LCDBlocking.o : TCPIP_Stack/LCDBlocking.c $(SDCC_HEADERS)  \
    $(SDCC_PIC16_HEADERS) $(APP_HEADERS) $(TCPIP_HEADERS)
 	$(CC) -c -mpic16 -p18f97j60  -o"Objects/LCDBlocking.o" \
               -L/usr/local/lib/pic16  TCPIP_Stack/LCDBlocking.c
 
-Objects/Tick.o : TCPIP_Stack/Tick.c  $(SDCC_HEADERS)  \
-   $(SDCC_PIC16_HEADERS) $(APP_HEADERS) $(TCPIP_HEADERS)
-	$(CC) -c -mpic16 -p18f97j60  -o"Objects/Tick.o" \
-              -L/usr/local/lib/pic16  TCPIP_Stack/Tick.c
-
 clean : 
-	$(RM) $(OBJECTS)
+	$(RM) -f Objects/*.* *.cod *.lst *.hex
 
